@@ -1,0 +1,10 @@
+version: 1.0
+provider:
+  name: openfaas
+  gateway: http://10.1.1.6:8081
+functions:
+  snorkel-flask:
+    lang: python3-http-debian
+    handler: ./snorkel-flask
+    image: yjain59/snorkel-flask:latest
+
