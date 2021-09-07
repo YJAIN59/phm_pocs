@@ -1,0 +1,9 @@
+{
+    "steps": {
+      "common": {
+        "dist": {"upper_threshold":158.00,"lower_threshold":18},
+        "peak_baseline_diff": {"upper_threshold":12,"lower_threshold":-9}
+      }
+    }
+  }
+  
