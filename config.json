@@ -1,9 +1,50 @@
-{
-    "steps": {
-      "common": {
-        "dist": {"upper_threshold":158.00,"lower_threshold":18},
-        "peak_baseline_diff": {"upper_threshold":12,"lower_threshold":-9}
-      }
+{   "minioClient":{
+    "server":"minio-metra-trial.phm-cicd.smart-mobility.alstom.com",
+    "key":"phmcicdmetratrial",
+    "secret":"ADugFLhxTVZdZYVfYf05WnL5JQu7k0BGCe6LUj/SD0Uirna6KF1HkSJEJ/JqmLGSyTr1BM2DJh9vK2k/damXIQ=="
+  },
+    "event":{
+      "bucket":"dev",
+      "filename":"metra_trial_pointmachines_CPRichards_1/maintenancerecords/unprocessed/phmbot_2020-05-26 000001.json"},
+    "rule1": {
+      "field":["maintenance_action"],
+      "matching_substring":["inspection","check"],
+      "label_name" :"Healthy"
+    },
+    "rule2": {
+      "field":["maintenance_type"],
+      "matching_substring":["Preventive"],
+      "label_name" :"Healthy"
+    },
+    "rule3": {
+      "field":["description"],
+      "matching_substring":["lock rod" , "indication rod" , "basket rod" , "throw rod" , "point detect, rod" , "cam bar" , "clutch" , "nuts" , "main gear" , "intermediate gear" , "mot," , "switch" , "switch plate" , "lock dog" , "mot,-brushes" , "rollers" , "sail switch" , "slide bar" , "heel block bolt" , "gear box" , "claw operating bar" , "claw lock backdrive" , "gear train" , "spring" , "points" , "brake" , "hydraulic group" , "drive rod" , "detection rod" , "nut" , "spring loaded lever" , "detection mechanism" , "locking mechanism"],
+      "label_name" :"Not Applicable"
+    },
+    "rule4": {
+      "field":["maintenance_type","description","maintenance_action"],
+      "matching_substring":["reset"],
+      "label_name" :"Not Applicable"
+    },
+    "rule5": {
+      "field":["description","maintenance_action"],
+      "matching_substring":["lubric" , "lube" , "glydex" , "glidex" , "friction" , "grease" , "oil", "clean" ],
+      "label_name" :"Degraded – Low"
+    },
+    "rule6": {
+      "field":["description","maintenance_action"],
+      "matching_substring":["adjust"],
+      "label_name" :"Degraded - Medium"
+    },
+    "rule7": {
+      "field":["description"],
+      "matching_substring":["rail run","running rail","heat","point pressure","loose","tighten"],
+      "label_name" :"Degraded - Medium"
+    },
+    "rule8": {
+      "field":["description","maintenance_action"],
+      "matching_substring":["break","broke","overhaul","replace","repair"],
+      "label_name" :"Degraded - High"
     }
   }
   
