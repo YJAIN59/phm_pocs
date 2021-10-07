@@ -10,7 +10,7 @@ import json
 config = json.load(open(os.path.join('function/config.json')))
 
 logging.basicConfig(format='[ %(asctime)s %(filename)s:%(lineno)s - %(funcName)s()] - %(name)s - %(levelname)s '
-                            '- %(message)s', level=logging.INFO)
+                            '- %(message)s', level=logging.INFO, filename='labelling.log')
 
 def snorkel_labelling(x,config):
     Healthy = 1
