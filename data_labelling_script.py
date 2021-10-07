@@ -3,10 +3,11 @@ from snorkel.labeling import labeling_function,PandasLFApplier,LFAnalysis
 from io import BytesIO
 import logging
 from snorkel.labeling.model import MajorityLabelVoter
-
+import os
 from minio import Minio
 import json
-config = json.load(open('config.json'))
+
+config = json.load(open(os.path.join('function/config.json')))
 
 logging.basicConfig(format='[ %(asctime)s %(filename)s:%(lineno)s - %(funcName)s()] - %(name)s - %(levelname)s '
                             '- %(message)s', level=logging.INFO)
@@ -163,6 +164,10 @@ def handle(event,context):
                 access_key=config['minioClient']['key'],
                 secret_key=config['minioClient']['secret'],
                 secure=True)
+    logging.info("**** YJ TESTING ***** \n")
+    logging.info(event.query["bucket"])
+    logging.info(event.query["filename"])
+    
     bucket_name = event.query["bucket"]
     #bucket_name = config['event']['bucket']
     filepath = event.query["filename"]
