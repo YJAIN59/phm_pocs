@@ -172,6 +172,17 @@ def handle(event,context):
     #bucket_name = config['event']['bucket']
     filepath = event.query["filename"]
     #filepath = config['event']['filename']
+    
+    if not (filepath.startswith(config['path_validation']['prefix']) and (
+        filepath.__contains__(config['path_validation']['folder']))):
+        logging.info("File path not acceptable")    
+        resp = {
+            "statusCode": 406,
+            "message": "File path not acceptable",
+        }
+        return resp
+      
+    logging.info("After File path validation")    
 
     """
     2. putting them into DataFrame
