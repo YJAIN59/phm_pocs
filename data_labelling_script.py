@@ -163,8 +163,10 @@ def handle(event,context):
                 access_key=config['minioClient']['key'],
                 secret_key=config['minioClient']['secret'],
                 secure=True)
-    bucket_name = config['event']['bucket']
-    filepath = config['event']['filename']
+    bucket_name = event.query["bucket"]
+    #bucket_name = config['event']['bucket']
+    filepath = event.query["filename"]
+    #filepath = config['event']['filename']
 
     """
     2. putting them into DataFrame
