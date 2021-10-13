@@ -169,17 +169,24 @@ def get_secret(name):
     secret : dict
          it will return all secrets
     """
+    logging.info(" ** inside get_secret ** "+name)
+
     with open(f"/var/openfaas/secrets/{name}") as sec:
         secret = sec.read().strip()
+        logging.info(" ** inside get_secret ** " + secret)
+
     return secret
 
 def handle(event,context):
     """
     Taking access of minioBucket
     """
+    logging.info(" ** Before fetching secrets **")
     minio_endpoint = get_secret('MINIO_ENDPOINT')
     minio_access_key = get_secret('MINIO_ACCESS_KEY')
     minio_secret_key = get_secret('MINIO_SECRET_KEY')
+    logging.info(" ** After fetching secrets **")
+             
     minioClient = Minio(minio_endpoint,
                 access_key=minio_access_key,
                 secret_key=minio_secret_key,
