@@ -155,14 +155,34 @@ def create_new_json(minioClient,bucket_name,full_path,df_res):
 
     return resp
 
+def get_secret(name):
+    """get_secret
+    This function will get secret name from file location
+
+    Parameters
+    ----------
+    name : str
+         Name of file
+
+    Returns
+    -------
+    secret : dict
+         it will return all secrets
+    """
+    with open(f"/var/openfaas/secrets/{name}") as sec:
+        secret = sec.read().strip()
+    return secret
+
 def handle(event,context):
-    print("inside handle")
     """
     Taking access of minioBucket
     """
-    minioClient = Minio(config['minioClient']['server'],
-                access_key=config['minioClient']['key'],
-                secret_key=config['minioClient']['secret'],
+    minio_endpoint = get_secret('MINIO_ENDPOINT')
+    minio_access_key = get_secret('MINIO_ACCESS_KEY')
+    minio_secret_key = get_secret('MINIO_SECRET_KEY')
+    minioClient = Minio(minio_endpoint,
+                access_key=minio_access_key,
+                secret_key=minio_secret_key,
                 secure=True)
     logging.info("**** YJ TESTING ***** \n")
     logging.info(event.query["bucket"])
@@ -172,7 +192,7 @@ def handle(event,context):
     #bucket_name = config['event']['bucket']
     filepath = event.query["filename"]
     #filepath = config['event']['filename']
-    
+
     if not (filepath.startswith(config['path_validation']['prefix']) and (
         filepath.__contains__(config['path_validation']['folder']))):
         logging.info("File path not acceptable")    
@@ -182,7 +202,7 @@ def handle(event,context):
         }
         return resp
       
-    logging.info("After File path validation")    
+    logging.info("After File path validation")  
 
     """
     2. putting them into DataFrame
