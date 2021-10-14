@@ -117,32 +117,28 @@ def snorkel_labelling(x,config):
     L_train = applier.apply(df=x)
     print(L_train)
 
-    #from snorkel.labeling.model import MajorityLabelVoter
     majority_model = MajorityLabelVoter(cardinality=10)
     preds = majority_model.predict(L_train,tie_break_policy = 'random') 
-    # print("preds")
-    # print(preds)      
     
     df_preds = pd.DataFrame(preds)
     df_preds.columns = ['Label']
     df_target = df_preds.replace({1:'Healthy',2:"Not Applicable", 3: "Degraded – Low", 4: "Degraded - Medium", 5:"Degraded - High", -1:"ABSTAIN"})
     print(df_preds)
-    #print(df_target)
     df_result = pd.concat([x,df_target],axis=1)
 
     return df_result
 
 
 def create_new_json(minioClient,bucket_name,full_path,df_res):
+    last_subfolder = config['path_validation']['last_subfolder']
     for i in range(len(df_res)):
         data1 = minioClient.get_object(bucket_name, full_path)
         json_body = json.loads(data1.data)
-        #print(json_body)
         json_body.update({"label":df_res.iloc[i, 4]})
         json_bytes = json.dumps(json_body).encode('utf-8')
         json_buffer = BytesIO(json_bytes)
 
-        destination_path = full_path.replace("unprocessed","labelled")
+        destination_path = full_path.replace(last_subfolder,"labelled")
         minioClient.put_object(bucket_name,
                         destination_path,
                         data=json_buffer,
@@ -181,27 +177,23 @@ def handle(event,context):
     """
     Taking access of minioBucket
     """
-    logging.info(" ** Before fetching secrets **")
     minio_endpoint = get_secret('MINIO_ENDPOINT')
     minio_access_key = get_secret('MINIO_ACCESS_KEY')
     minio_secret_key = get_secret('MINIO_SECRET_KEY')
-    logging.info(" ** After fetching secrets **")
              
     minioClient = Minio(minio_endpoint,
                 access_key=minio_access_key,
                 secret_key=minio_secret_key,
                 secure=True)
-    logging.info("**** YJ TESTING ***** \n")
+    logging.info("**** After Minio connection ***** \n")
     logging.info(event.query["bucket"])
     logging.info(event.query["filename"])
     
     bucket_name = event.query["bucket"]
-    #bucket_name = config['event']['bucket']
     filepath = event.query["filename"]
-    #filepath = config['event']['filename']
 
     if not (filepath.startswith(config['path_validation']['prefix']) and (
-        filepath.__contains__(config['path_validation']['folder']))):
+        filepath.__contains__(config['path_validation']['last_subfolder']))):
         logging.info("File path not acceptable")    
         resp = {
             "statusCode": 406,
@@ -220,20 +212,13 @@ def handle(event,context):
         data1 = minioClient.get_object(bucket_name, filepath.replace("+"," "))
     except KeyError as ex:
         logging.error("Error : %s key is   missing\n" % str(ex))
-        #resp = {"error": "Error : %s key is missing\n" % str(ex),
-        #        "statusCode": 403}
 
     except Exception as ex:
         logging.error("Error  Occurred*********: %s\n" % str(ex))
-        #resp = {"error": "Error Occurred*********: %s\n" % str(ex), "statusCode": 403}
 
 
     json_body = json.loads(data1.data)
-    #print(json_body)
-    print("\n")
-    #New dataframe
     df1 = pd.DataFrame(columns=['file_name', 'maintenance_type','maintenance_action','description'])
     df1.loc[len(df1.index)]= [filepath.split("/")[-1],json_body['maintenance_type'],json_body['maintenance_action'],json_body['description']]
-    print(df1)
     df_res = snorkel_labelling(df1,config)
     create_new_json(minioClient,bucket_name,filepath,df_res)

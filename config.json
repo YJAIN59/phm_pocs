@@ -1,15 +1,7 @@
-{   "minioClient":{
-    "server":"minio-metra-trial.phm-cicd.smart-mobility.alstom.com",
-    "key":"phmcicdmetratrial",
-    "secret":"ADugFLhxTVZdZYVfYf05WnL5JQu7k0BGCe6LUj/SD0Uirna6KF1HkSJEJ/JqmLGSyTr1BM2DJh9vK2k/damXIQ=="
-    },
-    "path_validation":{
+{   "path_validation":{
       "prefix":"metra",
-      "folder":"unprocessed"
+      "last_subfolder":"unprocessed"
     },
-    "event":{
-      "bucket":"dev",
-      "filename":"metra_trial_pointmachines_CPRichards_1/maintenancerecords/unprocessed/phmbot_2020-05-26 000001.json"},
     "rule1": {
       "field":["maintenance_action"],
       "matching_substring":["inspection","check"],
